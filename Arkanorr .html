@@ -1,0 +1,1274 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>⚔️ Arkanor Krónikái</title>
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;600;700&family=IM+Fell+English:ital@0;1&display=swap" rel="stylesheet">
+<style>
+/* ===== RESET ===== */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;color:#ead7a2;font-family:'IM Fell English',Georgia,serif;font-size:13px}
+
+body{
+  background:
+    linear-gradient(rgba(0,0,0,.75),rgba(0,0,0,.85)),
+    url("https://images.unsplash.com/photo-1511497584788-876760111969?q=80&w=1400&auto=format&fit=crop");
+  background-size:cover;
+  background-attachment:fixed;
+}
+
+/* ===== OUTER SHELL: header + body side-by-side ===== */
+#shell{
+  display:flex;
+  flex-direction:column;
+  height:100vh;
+  max-width:1300px;
+  margin:0 auto;
+  padding:6px;
+  gap:5px;
+}
+
+/* ===== TOP BAR ===== */
+.top{
+  flex-shrink:0;
+  background:linear-gradient(180deg,#231407,#080402);
+  border:2px solid #9b671f;
+  color:#ffd86b;
+  text-align:center;
+  font-family:'Cinzel',serif;
+  font-size:20px;
+  font-weight:700;
+  padding:7px 14px;
+  letter-spacing:3px;
+  text-transform:uppercase;
+  text-shadow:0 0 18px rgba(255,180,60,.45),0 2px 6px #000;
+  box-shadow:0 0 30px rgba(255,170,50,.12),inset 0 0 30px rgba(0,0,0,.5);
+}
+
+/* ===== NAV ===== */
+.nav{
+  flex-shrink:0;
+  display:flex;
+  flex-wrap:wrap;
+  gap:4px;
+  background:#0b0603;
+  border:2px solid #6b4215;
+  padding:5px;
+}
+
+/* ===== MAIN AREA (fills remaining height) ===== */
+.main-area{
+  flex:1;
+  display:grid;
+  grid-template-columns:210px 1fr 230px;
+  gap:5px;
+  min-height:0; /* crucial for flex children */
+}
+
+/* ===== PANELS ===== */
+.panel{
+  background:linear-gradient(160deg,#130d07,#050302);
+  border:2px solid #8a571c;
+  padding:8px;
+  box-shadow:inset 0 0 25px #000;
+  overflow-y:auto;
+  overflow-x:hidden;
+  scrollbar-width:thin;
+  scrollbar-color:#9b671f #050302;
+  animation:panelGlow 6s ease-in-out infinite;
+}
+.panel::-webkit-scrollbar{width:5px}
+.panel::-webkit-scrollbar-thumb{background:#8a571c;border-radius:3px}
+
+/* ===== INVENTORY ROW (bottom strip) ===== */
+.inv-strip{
+  flex-shrink:0;
+  background:linear-gradient(160deg,#130d07,#050302);
+  border:2px solid #8a571c;
+  padding:5px 8px;
+  box-shadow:inset 0 0 20px #000;
+}
+.inv-strip h3{
+  font-family:'Cinzel',serif;
+  color:#ffd86b;
+  font-size:12px;
+  margin-bottom:4px;
+  letter-spacing:1px;
+}
+.inv{
+  display:flex;
+  gap:4px;
+  flex-wrap:nowrap;
+  overflow-x:auto;
+  scrollbar-width:thin;
+  scrollbar-color:#9b671f #050302;
+  padding-bottom:2px;
+}
+.inv::-webkit-scrollbar{height:4px}
+.inv::-webkit-scrollbar-thumb{background:#8a571c}
+
+.slot{
+  flex-shrink:0;
+  width:72px;
+  height:72px;
+  border:1px solid #8a571c;
+  background:radial-gradient(circle at top,#1a1006,#050302);
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  text-align:center;
+  padding:3px;
+  cursor:pointer;
+  font-size:11px;
+  transition:.15s;
+  position:relative;
+  overflow:hidden;
+}
+.slot:hover{border-color:#ffd86b;transform:translateY(-2px) scale(1.05);box-shadow:0 0 12px rgba(255,200,80,.35)}
+.slot-img{width:36px;height:36px;object-fit:cover;border-radius:2px;margin-bottom:2px}
+.slot-emoji{font-size:26px;line-height:1;margin-bottom:2px}
+.slot b{color:#ead7a2;font-size:10px;font-family:'Cinzel',serif;line-height:1.1;display:block}
+.slot .small{color:#bfa46a;font-size:9px;font-style:italic}
+
+/* rarity borders */
+.slot.common{border-color:#777}
+.slot.magic{border-color:#54e24f;box-shadow:0 0 5px rgba(84,226,79,.2)}
+.slot.rare{border-color:#4ea0ff;box-shadow:0 0 7px rgba(78,160,255,.25)}
+.slot.epic{border-color:#b46cff;box-shadow:0 0 7px rgba(180,108,255,.25)}
+.slot.legendary{border-color:#ff9d2e;box-shadow:0 0 14px rgba(255,157,46,.45)}
+
+/* ===== TYPOGRAPHY ===== */
+h2{
+  color:#ffd86b;
+  font-family:'Cinzel',serif;
+  margin:0 0 7px;
+  border-bottom:1px solid #6b4215;
+  padding-bottom:5px;
+  font-size:15px;
+  letter-spacing:1px;
+  text-shadow:0 0 8px rgba(255,200,80,.2);
+}
+
+/* ===== BUTTONS ===== */
+button{
+  background:linear-gradient(180deg,#704416,#241105);
+  border:1px solid #b47a2c;
+  color:#ffe2a0;
+  padding:6px 8px;
+  border-radius:5px;
+  font-family:'IM Fell English',Georgia,serif;
+  font-weight:bold;
+  font-size:11px;
+  cursor:pointer;
+  transition:.15s;
+  position:relative;
+  overflow:hidden;
+}
+button:hover{filter:brightness(1.3);transform:translateY(-1px) scale(1.02);box-shadow:0 3px 10px rgba(255,170,50,.22)}
+button:active{transform:scale(.97);filter:brightness(.95)}
+
+/* ===== STAT ROWS ===== */
+.row{display:flex;justify-content:space-between;align-items:center;margin:3px 0;font-size:12px;gap:5px}
+.row b{color:#ffd86b}
+.bar{flex:1;background:#090603;border:1px solid #7c501b;height:16px;border-radius:4px;overflow:hidden}
+.fill{height:100%;line-height:16px;text-align:center;font-weight:bold;font-size:10px;font-family:'Cinzel',serif;color:#fff;text-shadow:0 1px 3px #000;min-width:34px;transition:width .35s ease}
+.fill.hp{background:linear-gradient(90deg,#7c0909,#d92828);animation:pulseRed 2.5s ease-in-out infinite}
+.fill.en{background:linear-gradient(90deg,#116b18,#27bd3d)}
+.fill.xp{background:linear-gradient(90deg,#243f9d,#4f72ff)}
+
+.statGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:3px;margin-top:6px}
+.statBox{border:1px solid #6b4215;background:#080502;padding:4px 2px;text-align:center;font-size:11px;font-family:'Cinzel',serif;color:#ffd86b}
+
+/* ===== PORTRAIT / AI IMAGE ===== */
+.portrait-wrap{
+  position:relative;
+  height:130px;
+  border:2px solid #8a571c;
+  background:radial-gradient(circle at center,rgba(255,120,0,.1),transparent 65%),linear-gradient(#1a1006,#080402);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;
+  margin-bottom:7px;
+}
+.portrait-wrap img{width:100%;height:100%;object-fit:cover;border-radius:1px}
+.portrait-emoji{font-size:64px;line-height:1}
+.portrait-loading{font-size:11px;color:#bfa46a;font-style:italic;text-align:center}
+
+/* ===== EQUIP BOXES ===== */
+.equipBox{
+  border:1px solid #6b4215;
+  background:radial-gradient(circle at top,#1a1006,#050302);
+  padding:7px 9px;margin-bottom:6px;font-size:12px;line-height:1.7;border-radius:3px;
+}
+.equipBox b{color:#ffd86b;font-family:'Cinzel',serif}
+
+/* ===== BATTLE ===== */
+.battleBox{
+  position:relative;
+  background:
+    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.55)),
+    url("https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop");
+  background-size:cover;background-position:center;
+  border-radius:6px;padding:12px;border:1px solid #8a571c;overflow:hidden;
+}
+.enemyName{text-align:center;color:#ffd86b;font-family:'Cinzel',serif;font-size:20px;font-weight:700;text-shadow:0 0 12px rgba(255,180,60,.5)}
+.enemyArtWrap{
+  height:160px;border:1px solid rgba(138,87,28,.6);
+  background:radial-gradient(circle at center,rgba(255,120,0,.2),transparent 55%),linear-gradient(rgba(25,16,10,.7),rgba(5,3,2,.8));
+  display:flex;align-items:center;justify-content:center;
+  margin:8px 0;border-radius:6px;position:relative;overflow:hidden;
+  animation:floatEnemy 3s ease-in-out infinite;
+}
+.enemyArtWrap img{width:100%;height:100%;object-fit:cover}
+.enemyArtWrap.enemyHit{animation:enemyHitAnim .25s ease both}
+.enemy-emoji{font-size:80px}
+.battleText{
+  border:1px solid #6b4215;background:rgba(8,5,2,.78);
+  padding:8px 10px;min-height:50px;margin-top:8px;font-size:13px;line-height:1.5;border-radius:4px;
+}
+.damagePop{
+  position:absolute;left:50%;top:130px;transform:translateX(-50%);
+  font-family:'Cinzel',serif;font-size:38px;font-weight:700;color:#ff3333;
+  text-shadow:0 0 12px #000,0 0 20px rgba(255,50,50,.6);
+  animation:dmgFloat .8s forwards;pointer-events:none;z-index:20;
+}
+.damagePop.crit{color:#ffd633;font-size:48px}
+.damagePop.heal{color:#44ff77}
+
+/* ===== LOG ===== */
+.log{
+  height:100%;max-height:260px;overflow:auto;border:1px solid #6b4215;
+  background:#070402;padding:8px;line-height:1.45;font-size:12px;
+  scrollbar-width:thin;scrollbar-color:#9b671f #050302;
+}
+.log::-webkit-scrollbar{width:6px}
+.log::-webkit-scrollbar-thumb{background:#8a571c;border-radius:3px}
+
+/* ===== MINIMAP ===== */
+.minimap-wrap{
+  background:#050302;border:1px solid #8a571c;padding:6px;margin-bottom:8px;border-radius:3px;
+}
+.minimap-title{font-family:'Cinzel',serif;color:#ffd86b;font-size:11px;margin-bottom:4px;letter-spacing:1px}
+.minimap-grid{
+  display:grid;
+  gap:2px;
+}
+.mm-cell{
+  width:18px;height:18px;border-radius:2px;border:1px solid #3a2008;
+  background:#0a0603;display:flex;align-items:center;justify-content:center;
+  font-size:9px;transition:.2s;
+}
+.mm-cell.visited{background:#1a1206;border-color:#6b4215}
+.mm-cell.current{background:#3a2010;border-color:#ffd86b;box-shadow:0 0 6px rgba(255,216,107,.5)}
+.mm-cell.enemy-here{background:#2a0808;border-color:#d92828}
+.mm-cell.loot-here{background:#0a1a08;border-color:#27bd3d}
+.mm-cell.fog{opacity:.3}
+
+/* ===== FOREST ===== */
+.forestBg{
+  border:1px solid #8a571c;padding:14px;min-height:120px;
+  box-shadow:inset 0 0 50px #000;
+  background:linear-gradient(rgba(0,0,0,.62),rgba(0,0,0,.88)),url("https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1200");
+  background-size:cover;background-position:center;border-radius:4px;
+}
+.glowText{font-family:'Cinzel',serif;color:#60c060;font-size:17px;text-shadow:0 0 14px rgba(96,200,96,.55);margin-bottom:6px}
+.forestChoice{display:flex;gap:6px;flex-wrap:wrap;margin-top:10px}
+
+/* ===== UTIL ===== */
+.red{color:#ff4b4b}.green{color:#54e24f}.blue{color:#4ea0ff}
+.gold{color:#ffd86b;animation:goldGlow 2.5s ease-in-out infinite}
+.small{color:#bfa46a;font-size:11px;font-style:italic}
+.footer-strip{flex-shrink:0;padding:4px 8px;text-align:center;border:1px solid #6b4215;background:#080502;font-size:11px;color:#7a5a30;font-style:italic}
+
+/* ===== ANIMATIONS ===== */
+@keyframes panelGlow{
+  0%,100%{box-shadow:inset 0 0 25px #000,0 0 3px rgba(255,170,50,.06)}
+  50%{box-shadow:inset 0 0 25px #000,0 0 12px rgba(255,170,50,.18),0 0 25px rgba(255,100,0,.05)}
+}
+@keyframes floatEnemy{0%,100%{transform:translateY(0)}50%{transform:translateY(-5px)}}
+@keyframes pulseRed{0%,100%{filter:brightness(1)}50%{filter:brightness(1.4)}}
+@keyframes dmgFloat{from{opacity:1;transform:translateX(-50%) translateY(0) scale(1)}to{opacity:0;transform:translateX(-50%) translateY(-65px) scale(1.2)}}
+@keyframes enemyHitAnim{0%{transform:translateX(0)}25%{transform:translateX(-9px)}50%{transform:translateX(9px)}75%{transform:translateX(-5px)}100%{transform:translateX(0)}}
+@keyframes goldGlow{0%,100%{text-shadow:0 0 6px rgba(255,200,80,.3)}50%{text-shadow:0 0 16px rgba(255,200,80,.7),0 0 28px rgba(255,120,0,.2)}}
+@keyframes spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ===== RESPONSIVE ===== */
+@media(max-width:900px){
+  html,body{overflow:auto}
+  #shell{height:auto;overflow:auto}
+  .main-area{grid-template-columns:1fr}
+  .inv{flex-wrap:wrap}
+}
+</style>
+</head>
+<body>
+<div id="shell">
+  <div class="top">⚔️ Arkanor Krónikái ⚔️</div>
+  <div class="nav" id="nav"></div>
+  <div class="main-area">
+    <div class="panel" id="left-panel"></div>
+    <div class="panel" id="main"></div>
+    <div class="panel" id="right-panel"></div>
+  </div>
+  <div class="inv-strip">
+    <h3>🎒 Táska <span id="inv-count"></span></h3>
+    <div class="inv" id="inv-row"></div>
+  </div>
+  <div class="footer-strip">⚔️ Arkanor Krónikái &nbsp;•&nbsp; Kattints az itemekre: használat / felszerelés / eladás</div>
+</div>
+
+<script>
+// ===================== KÉPCACHE =====================
+const imgCache={};
+let apiCallsInFlight=0;
+
+async function getImage(prompt,key){
+  if(imgCache[key])return imgCache[key];
+  if(apiCallsInFlight>3)return null; // ne floodoljuk az API-t
+  apiCallsInFlight++;
+  try{
+    const res=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:1000,
+        messages:[{role:"user",content:[
+          {type:"text",text:`Generate a short base64 data URI for a tiny 80x80 pixel fantasy game sprite image of: ${prompt}. 
+Return ONLY a JSON object like: {"dataUri":"data:image/png;base64,..."}
+The image should be dark fantasy style, pixel-art or painterly, transparent background if possible.
+If you cannot generate an actual image, return {"dataUri":null}`}
+        ]}]
+      })
+    });
+    const data=await res.json();
+    const text=data.content?.map(c=>c.text||"").join("");
+    try{
+      const json=JSON.parse(text.replace(/```json|```/g,"").trim());
+      if(json.dataUri){imgCache[key]=json.dataUri;return json.dataUri;}
+    }catch(e){}
+    return null;
+  }catch(e){return null;}
+  finally{apiCallsInFlight--;}
+}
+
+// Pixelart placeholder generálás canvas-szal (fallback)
+function makePixelSprite(emoji,size=80){
+  const canvas=document.createElement("canvas");
+  canvas.width=size;canvas.height=size;
+  const ctx=canvas.getContext("2d");
+  // háttér
+  const grad=ctx.createRadialGradient(size/2,size/2,0,size/2,size/2,size/2);
+  grad.addColorStop(0,"rgba(60,35,10,0.7)");
+  grad.addColorStop(1,"rgba(5,3,2,0.9)");
+  ctx.fillStyle=grad;
+  ctx.beginPath();ctx.arc(size/2,size/2,size/2,0,Math.PI*2);ctx.fill();
+  // emoji
+  ctx.font=`${size*0.55}px serif`;
+  ctx.textAlign="center";ctx.textBaseline="middle";
+  ctx.shadowColor="rgba(255,180,0,0.4)";ctx.shadowBlur=8;
+  ctx.fillText(emoji,size/2,size/2+2);
+  return canvas.toDataURL();
+}
+
+// ===================== ADATOK =====================
+let player={
+  name:"Vándor",level:1,xp:0,hp:100,maxHp:100,en:50,maxEn:50,
+  silver:120,clicks:80,atk:8,def:2,gender:null,class:null,statPoints:0,
+  stats:{str:1,vit:1,int:1,dex:1,luck:1},
+  weapon:{name:"Bot",type:"weapon",classReq:"all",atk:2,icon:"🪵",desc:"+2 támadás"},
+  armor:{name:"Rongyos ruha",type:"armor",classReq:"all",def:1,icon:"🥼",desc:"+1 védelem"},
+  ring:{name:"Nincs gyűrű",type:"ring",classReq:"all",icon:"⭕",desc:"Üres"},
+  amulet:{name:"Nincs amulett",type:"amulet",classReq:"all",icon:"📿",desc:"Üres"},
+  bagCap:10,stashCap:30,stash:[],
+  inv:[
+    {name:"Kis gyógyital",type:"potion",icon:"🧪",desc:"+35 élet"},
+    {name:"Rozsdás penge",type:"junk",icon:"🗡️",desc:"Eladható"}
+  ],
+  kills:{},found:{},maxForestDepth:0,
+  achievements:[],crafted:0,arenaWins:0,bossKills:0,
+  portraitKey:null
+};
+
+let enemy=null;
+let currentScreen="town";
+let battleMessage="Válassz támadást...";
+let forestDepth=0;
+let activeQuests=[];
+let completedQuestIds=[];
+window.oldLog="";
+
+// Minimap állapot
+let minimap=[];
+let playerPos={x:5,y:5};
+const MM_SIZE=11;
+
+function initMinimap(){
+  minimap=[];
+  for(let y=0;y<MM_SIZE;y++){
+    minimap.push([]);
+    for(let x=0;x<MM_SIZE;x++){
+      minimap[y].push({visited:false,type:"empty",event:null});
+    }
+  }
+  playerPos={x:5,y:5};
+  minimap[5][5].visited=true;
+  minimap[5][5].type="start";
+}
+initMinimap();
+
+function movePlayer(dx,dy){
+  let nx=Math.max(0,Math.min(MM_SIZE-1,playerPos.x+dx));
+  let ny=Math.max(0,Math.min(MM_SIZE-1,playerPos.y+dy));
+  playerPos={x:nx,y:ny};
+  if(!minimap[ny][nx].visited){
+    minimap[ny][nx].visited=true;
+    let roll=Math.random();
+    if(roll<0.35)minimap[ny][nx].type="enemy";
+    else if(roll<0.55)minimap[ny][nx].type="loot";
+    else if(roll<0.65)minimap[ny][nx].type="hideout";
+    else minimap[ny][nx].type="empty";
+  }
+}
+
+function renderMinimap(){
+  const VIS=5; // látható sugár: 5x5 rács a játékos körül
+  let cx=playerPos.x,cy=playerPos.y;
+  let html=`<div class="minimap-wrap"><div class="minimap-title">🗺️ Térkép — Mélység: ${forestDepth}</div>`;
+  html+=`<div class="minimap-grid" style="grid-template-columns:repeat(${MM_SIZE},18px)">`;
+  for(let y=0;y<MM_SIZE;y++){
+    for(let x=0;x<MM_SIZE;x++){
+      let cell=minimap[y][x];
+      let dist=Math.abs(x-cx)+Math.abs(y-cy);
+      let isCurrent=x===cx&&y===cy;
+      let cls="mm-cell";
+      let inner="";
+      if(isCurrent){cls+=" current";inner="🧍";}
+      else if(!cell.visited||dist>4){cls+=" fog";}
+      else if(cell.type==="enemy"){cls+=" enemy-here";inner="⚔";}
+      else if(cell.type==="loot"){cls+=" loot-here";inner="✦";}
+      else if(cell.type==="hideout"){inner="🕯";}
+      else if(cell.type==="start"){inner="🏠";}
+      else if(cell.visited){cls+=" visited";}
+      html+=`<div class="${cls}" title="${cell.type}">${inner}</div>`;
+    }
+  }
+  html+="</div></div>";
+  return html;
+}
+
+const classes={
+  warrior:{name:"Harcos",icon:"🛡️",promptDesc:"medieval fantasy warrior in heavy armor"},
+  mage:{name:"Mágus",icon:"🔮",promptDesc:"dark fantasy wizard with glowing staff"},
+  archer:{name:"Íjász",icon:"🏹",promptDesc:"fantasy archer in leather armor with bow"},
+  ninja:{name:"Ninja",icon:"🥷",promptDesc:"dark fantasy ninja assassin in shadows"}
+};
+
+const enemies=[
+  {name:"Patkányember",icon:"🐀",level:2,hp:30,maxHp:30,atk:6,xp:25,silver:30,imgPrompt:"fantasy ratman creature, dark dungeon"},
+  {name:"Goblin csavargó",icon:"👺",level:3,hp:55,maxHp:55,atk:9,xp:40,silver:50,imgPrompt:"green goblin rogue, dark fantasy"},
+  {name:"Csontváz őr",icon:"💀",level:4,hp:85,maxHp:85,atk:13,xp:65,silver:85,imgPrompt:"skeleton warrior with sword and shield, dark fantasy"},
+  {name:"Farkasfalka",icon:"🐺",level:5,hp:110,maxHp:110,atk:17,xp:95,silver:120,imgPrompt:"large fantasy dire wolf, menacing, dark forest"},
+  {name:"Mocsári démon",icon:"👹",level:7,hp:180,maxHp:180,atk:24,xp:160,silver:220,imgPrompt:"swamp demon monster, dark fantasy, glowing eyes"},
+  {name:"Árnyékpók",icon:"🕷️",level:6,hp:145,maxHp:145,atk:22,xp:140,silver:160,imgPrompt:"giant shadow spider creature, dark fantasy"},
+  {name:"Korhadt ent",icon:"🌳",level:8,hp:240,maxHp:240,atk:28,xp:230,silver:280,imgPrompt:"corrupted tree monster, dark fantasy, rotting wood"}
+];
+
+const dungeonBosses=[
+  {name:"Kriptaőr",icon:"🧟",level:8,hp:240,maxHp:240,atk:26,xp:280,silver:350,boss:true,imgPrompt:"undead crypt guardian zombie boss, dark dungeon"},
+  {name:"Vérgróf",icon:"🧛",level:10,hp:320,maxHp:320,atk:34,xp:500,silver:600,boss:true,imgPrompt:"vampire count boss, dark gothic fantasy, dramatic lighting"},
+  {name:"Csontkirály",icon:"☠️",level:12,hp:420,maxHp:420,atk:42,xp:800,silver:900,boss:true,imgPrompt:"skeleton king boss with crown, epic dark fantasy"}
+];
+
+const forestLoot=[
+  {name:"Erdei gomba",type:"potion",icon:"🍄",desc:"+15 élet"},
+  {name:"Kis gyógyital",type:"potion",icon:"🧪",desc:"+35 élet"},
+  {name:"Régi érme",type:"junk",icon:"🪙",desc:"Eladható"},
+  {name:"Állatcsont",type:"junk",icon:"🦴",desc:"Eladható"},
+  {name:"Fénylő kavics",type:"junk",icon:"💎",desc:"Ritka"},
+  {name:"Szakadt térkép",type:"junk",icon:"📜",desc:"Rejtélyes"},
+  {name:"Farkasbőr",type:"junk",icon:"🐾",desc:"Eladható"}
+];
+
+const rareLoot=[
+  {name:"Farkasölő penge",type:"weapon",classReq:"warrior",icon:"🗡️",atk:26,str:5,rarity:"rare",desc:"Harcos ritka fegyver"},
+  {name:"Lángpálca",type:"weapon",classReq:"mage",icon:"🔥",atk:20,int:9,rarity:"rare",desc:"Mágus ritka fegyver"},
+  {name:"Sólyomíj",type:"weapon",classReq:"archer",icon:"🏹",atk:24,dex:7,rarity:"rare",desc:"Íjász ritka fegyver"},
+  {name:"Árnyékpenge",type:"weapon",classReq:"ninja",icon:"⚔️",atk:27,dex:8,luck:3,rarity:"rare",desc:"Ninja ritka fegyver"},
+  {name:"Csontpáncél",type:"armor",classReq:"warrior",icon:"🛡️",def:26,vit:6,rarity:"rare",desc:"Harcos ritka vért"},
+  {name:"Holdköpeny",type:"armor",classReq:"mage",icon:"🌙",def:16,int:8,rarity:"rare",desc:"Mágus ritka köpeny"},
+  {name:"Vadőr kabát",type:"armor",classReq:"archer",icon:"🥋",def:18,dex:6,rarity:"rare",desc:"Íjász ritka vért"},
+  {name:"Éjruha",type:"armor",classReq:"ninja",icon:"🖤",def:17,dex:8,luck:4,rarity:"rare",desc:"Ninja ritka vért"},
+  {name:"Harcos pecsétgyűrű",type:"ring",classReq:"warrior",icon:"💍",str:6,vit:3,rarity:"rare",desc:"Harcos gyűrű"},
+  {name:"Mágus fókuszgyűrű",type:"ring",classReq:"mage",icon:"💍",int:7,luck:2,rarity:"rare",desc:"Mágus gyűrű"},
+  {name:"Íjász sólyomgyűrű",type:"ring",classReq:"archer",icon:"💍",dex:7,luck:2,rarity:"rare",desc:"Íjász gyűrű"},
+  {name:"Ninja árnygyűrű",type:"ring",classReq:"ninja",icon:"💍",dex:5,luck:5,rarity:"rare",desc:"Ninja gyűrű"}
+];
+
+const shopItems=[
+  {name:"Vaskard",type:"weapon",classReq:"warrior",icon:"🗡️",atk:10,price:160,desc:"+10 atk"},
+  {name:"Tanonc pálca",type:"weapon",classReq:"mage",icon:"🪄",atk:9,int:3,price:160,desc:"+9 atk +3 int"},
+  {name:"Vadászíj",type:"weapon",classReq:"archer",icon:"🏹",atk:10,dex:3,price:160,desc:"+10 atk +3 dex"},
+  {name:"Ninja penge",type:"weapon",classReq:"ninja",icon:"🥷",atk:12,dex:3,price:180,desc:"+12 atk +3 dex"},
+  {name:"Láncing",type:"armor",classReq:"warrior",icon:"🛡️",def:14,price:420,desc:"+14 def"},
+  {name:"Mágusköpeny",type:"armor",classReq:"mage",icon:"🧥",def:8,int:4,price:360,desc:"+8 def +4 int"},
+  {name:"Vadőr kabát",type:"armor",classReq:"archer",icon:"🥋",def:10,dex:4,price:360,desc:"+10 def +4 dex"},
+  {name:"Árnyruha",type:"armor",classReq:"ninja",icon:"🖤",def:9,dex:5,price:420,desc:"+9 def +5 dex"},
+  {name:"Kis gyógyital",type:"potion",icon:"🧪",desc:"+35 élet",price:45},
+  {name:"Nagy gyógyital",type:"potion",icon:"🍷",desc:"+75 élet",price:100},
+  {name:"Nagyobb táska",type:"bag",icon:"🎒",bagCap:14,price:350,desc:"14 tárhely"},
+  {name:"Utazó táska",type:"bag",icon:"🧳",bagCap:20,price:850,desc:"20 tárhely"}
+];
+
+const quests=[
+  {id:"rats3",title:"Patkányirtás",desc:"Ölj meg 3 Patkányembert.",type:"kill",target:"Patkányember",need:3,reward:{xp:100,silver:120,item:{name:"Kis gyógyital",type:"potion",icon:"🧪",desc:"+35 élet"}}},
+  {id:"map1",title:"Szakadt térkép",desc:"Találj egy Szakadt térképet.",type:"find",target:"Szakadt térkép",need:1,reward:{xp:140,silver:80,item:{name:"Rozsdás kulcs",type:"key",icon:"🗝️",desc:"Dungeon kulcs"}}},
+  {id:"depth10",title:"Mélyebbre",desc:"Érd el a 10-es erdőmélységet.",type:"depth",target:"forestDepth",need:10,reward:{xp:180,silver:180,item:{name:"Nagy gyógyital",type:"potion",icon:"🍷",desc:"+75 élet"}}},
+  {id:"goblins2",title:"Goblin fenyegetés",desc:"Ölj meg 2 Goblin csavargót.",type:"kill",target:"Goblin csavargó",need:2,reward:{xp:130,silver:160,item:{name:"Rozsdás kulcs",type:"key",icon:"🗝️",desc:"Dungeon kulcs"}}}
+];
+
+const forgeRecipes=[
+  {name:"Csontkard",need:["Állatcsont","Állatcsont","Rozsdás penge"],reward:{name:"Csontkard",type:"weapon",classReq:"warrior",icon:"🦴",atk:18,str:3,rarity:"rare",desc:"Craftolt fegyver"}},
+  {name:"Kristálypálca",need:["Fénylő kavics","Fénylő kavics"],reward:{name:"Kristálypálca",type:"weapon",classReq:"mage",icon:"💠",atk:17,int:7,rarity:"rare",desc:"Craftolt fegyver"}},
+  {name:"Vadőr íj",need:["Farkasbőr","Állatcsont","Régi érme"],reward:{name:"Vadőr íj",type:"weapon",classReq:"archer",icon:"🏹",atk:19,dex:5,rarity:"rare",desc:"Craftolt fegyver"}}
+];
+
+const alchemyRecipes=[
+  {name:"Nagy gyógyital",need:["Erdei gomba","Erdei gomba","Kis gyógyital"],reward:{name:"Nagy gyógyital",type:"potion",icon:"🍷",desc:"+75 élet"}},
+  {name:"Rozsdás kulcs",need:["Szakadt térkép","Fénylő kavics","Régi érme"],reward:{name:"Rozsdás kulcs",type:"key",icon:"🗝️",desc:"Dungeon kulcs"}}
+];
+
+const arenaEnemies=[
+  {name:"Kezdő gladiátor",icon:"🗡️",level:3,hp:70,maxHp:70,atk:10,xp:80,silver:100,arena:true,imgPrompt:"gladiator fighter in arena, dark fantasy"},
+  {name:"Veterán bajnok",icon:"🛡️",level:6,hp:150,maxHp:150,atk:20,xp:180,silver:240,arena:true,imgPrompt:"veteran arena champion warrior, dark fantasy"},
+  {name:"Aréna mester",icon:"👑",level:10,hp:300,maxHp:300,atk:34,xp:450,silver:650,arena:true,imgPrompt:"arena master boss with golden crown, epic dark fantasy"}
+];
+
+const achievements=[
+  {id:"firstKill",title:"Első vér",desc:"Ölj meg 1 szörnyet.",reward:{xp:50,silver:50}},
+  {id:"ratHunter",title:"Patkányirtó",desc:"Ölj meg 3 Patkányembert.",reward:{xp:120,silver:120}},
+  {id:"deep10",title:"Erdőjáró",desc:"Érd el a 10-es mélységet.",reward:{xp:150,silver:150}},
+  {id:"firstBoss",title:"Kriptahódító",desc:"Győzz le 1 dungeon bosst.",reward:{xp:300,silver:300}},
+  {id:"firstCraft",title:"Kezdő kovács",desc:"Craftolj 1 tárgyat.",reward:{xp:100,silver:100}},
+  {id:"arena1",title:"Aréna túlélő",desc:"Nyerj 1 aréna harcot.",reward:{xp:160,silver:180}}
+];
+
+// ===================== UTILS =====================
+function r(a,b){return Math.floor(Math.random()*(b-a+1))+a}
+function needXp(){return player.level*100}
+function bonus(k){return(player.weapon[k]||0)+(player.armor[k]||0)+(player.ring[k]||0)+(player.amulet[k]||0)}
+function atkTotal(){return player.atk+(player.weapon.atk||0)+player.stats.str*2+bonus("str")}
+function defTotal(){return player.def+(player.armor.def||0)+player.stats.vit*2+bonus("vit")}
+function critTotal(){return Math.min(60,10+player.stats.luck*2+bonus("luck")*2)}
+function dodgeTotal(){return Math.min(45,5+player.stats.dex*2+bonus("dex")*2)}
+
+function normalize(){
+  if(!player.stats)player.stats={str:1,vit:1,int:1,dex:1,luck:1};
+  if(!player.stash)player.stash=[];
+  if(!player.bagCap)player.bagCap=10;
+  if(!player.stashCap)player.stashCap=30;
+  if(!player.kills)player.kills={};
+  if(!player.found)player.found={};
+  if(!player.ring)player.ring={name:"Nincs gyűrű",type:"ring",classReq:"all",icon:"⭕",desc:"Üres"};
+  if(!player.amulet)player.amulet={name:"Nincs amulett",type:"amulet",classReq:"all",icon:"📿",desc:"Üres"};
+  if(!player.achievements)player.achievements=[];
+  if(!player.crafted)player.crafted=0;
+  if(!player.arenaWins)player.arenaWins=0;
+  if(!player.bossKills)player.bossKills=0;
+}
+
+function bar(name,val,max,cls){
+  let p=Math.max(0,Math.min(100,val/max*100));
+  return`<div class="row">${name}<div class="bar"><div class="fill ${cls}" style="width:${p}%">${val}/${max}</div></div></div>`;
+}
+
+function log(t){
+  let box=document.getElementById("log");
+  if(!box)return;
+  box.innerHTML+="• "+t+"<br>";
+  box.scrollTop=box.scrollHeight;
+  window.oldLog=box.innerHTML;
+}
+function saveLog(){let b=document.getElementById("log");if(b)window.oldLog=b.innerHTML}
+function setMain(html){document.getElementById("main").innerHTML=html}
+
+function addItem(item){
+  if(player.inv.length>=player.bagCap){log("Tele van a táskád. A tárgy elveszett: "+item.name);return false}
+  player.inv.push({...item});
+  player.found[item.name]=(player.found[item.name]||0)+1;
+  return true;
+}
+function useClick(n){if(player.clicks<n){log("Nincs elég clicked.");return false}player.clicks-=n;return true}
+
+function raritySlotClass(it){
+  if(!it)return"";
+  let rv=it.rarity||"";
+  if(rv==="legendary")return" legendary";
+  if(rv==="epic")return" epic";
+  if(rv==="rare")return" rare";
+  if(rv==="magic")return" magic";
+  return" common";
+}
+
+function slotHtml(it,i,onclick){
+  if(!it)return`<div class="slot common" onclick="${onclick}(${i})"><span class="small">Üres</span></div>`;
+  let cls=raritySlotClass(it);
+  // Ha van pixel sprite a cache-ben, használjuk
+  let imgKey="item_"+it.name;
+  let imgHtml=`<div class="slot-emoji">${it.icon}</div>`;
+  if(imgCache[imgKey]){imgHtml=`<img class="slot-img" src="${imgCache[imgKey]}" alt="${it.name}">`;}
+  return`<div class="slot${cls}" onclick="${onclick}(${i})">${imgHtml}<b>${it.name}</b><span class="small">${it.desc||""}</span></div>`;
+}
+
+// ===================== PORTRAIT =====================
+function portraitEmoji(){
+  if(!player.class)return"🧙‍♂️";
+  if(player.class==="warrior")return player.gender==="female"?"🛡️":"🧔‍♂️";
+  if(player.class==="mage")return player.gender==="female"?"🧙‍♀️":"🧙‍♂️";
+  if(player.class==="archer")return"🏹";
+  if(player.class==="ninja")return"🥷";
+  return"🧙‍♂️";
+}
+
+function getPortraitKey(){
+  return`portrait_${player.class||"default"}_${player.gender||"m"}`;
+}
+
+async function loadPortrait(){
+  if(!player.class)return;
+  let key=getPortraitKey();
+  if(imgCache[key]){updatePortrait(imgCache[key]);return}
+  let cl=classes[player.class];
+  let gender=player.gender==="female"?"female ":"male ";
+  let prompt=`${gender}${cl.promptDesc}, portrait, dark fantasy RPG, dramatic lighting, highly detailed`;
+  let sprite=makePixelSprite(cl.icon,130);
+  imgCache[key]=sprite;
+  updatePortrait(sprite);
+}
+
+function updatePortrait(src){
+  let wrap=document.getElementById("portrait-wrap");
+  if(!wrap)return;
+  wrap.innerHTML=`<img src="${src}" alt="karakter">`;
+}
+
+// ===================== ENEMY IMAGE =====================
+async function loadEnemyImage(e){
+  if(!e)return;
+  let key="enemy_"+e.name;
+  // Pixel sprite fallback azonnal
+  let sprite=makePixelSprite(e.icon,160);
+  if(!imgCache[key])imgCache[key]=sprite;
+  updateEnemyImage(imgCache[key]);
+}
+
+function updateEnemyImage(src){
+  let wrap=document.getElementById("enemyArtWrap");
+  if(!wrap)return;
+  wrap.innerHTML=`<img src="${src}" alt="ellenfél" style="width:100%;height:100%;object-fit:cover;border-radius:6px">`;
+}
+
+// ===================== RENDER =====================
+function render(){
+  normalize();
+  renderNav();
+  renderLeft();
+  renderRight();
+  renderInv();
+
+  if(currentScreen==="town")town(false);
+  else if(currentScreen==="forest")forest(false);
+  else if(currentScreen==="tavern")tavern(false);
+  else if(currentScreen==="shop")shop(false);
+  else if(currentScreen==="class")classRoom(false);
+  else if(currentScreen==="equipment")equipment(false);
+  else if(currentScreen==="home")home(false);
+  else if(currentScreen==="dungeon")dungeon(false);
+  else if(currentScreen==="battle"&&enemy)battle(false);
+  else if(currentScreen==="hideout")hideout(false);
+  else town(false);
+}
+
+function renderNav(){
+  document.getElementById("nav").innerHTML=`
+    <button onclick="town()">🏰 Város</button>
+    <button onclick="forest()">🌲 Erdő</button>
+    <button onclick="tavern()">🍺 Kocsma</button>
+    <button onclick="shop()">🛒 Bolt</button>
+    <button onclick="classRoom()">🧬 Kaszt</button>
+    <button onclick="equipment()">🛡️ Felszerelés</button>
+    <button onclick="home()">🏚️ Rejtekhely</button>
+    <button onclick="dungeon()">🕳️ Dungeon</button>
+    <button onclick="rest()">🛏️ Pihenés</button>
+    <button onclick="save()">💾 Mentés</button>
+    <button onclick="load()">📜 Betöltés</button>
+  `;
+}
+
+function renderLeft(){
+  document.getElementById("left-panel").innerHTML=`
+    <h2>Karakter</h2>
+    <div class="portrait-wrap" id="portrait-wrap"><div class="portrait-emoji">${portraitEmoji()}</div></div>
+    <div class="row">Név: <b>${player.name}</b></div>
+    <div class="row">Kaszt: <b>${player.class?classes[player.class].name:"—"}</b></div>
+    <div class="row">Szint: <b>${player.level}</b> &nbsp; Pontok: <b>${player.statPoints}</b></div>
+    <div class="row">Ezüst: <b>${player.silver}🪙</b> &nbsp; Click: <b>${player.clicks}⏱</b></div>
+    ${bar("❤️",player.hp,player.maxHp,"hp")}
+    ${bar("⚡",player.en,player.maxEn,"en")}
+    ${bar("✨",player.xp,needXp(),"xp")}
+    <div class="statGrid">
+      <div class="statBox">⚔️<br>${atkTotal()}</div>
+      <div class="statBox">🛡️<br>${defTotal()}</div>
+      <div class="statBox">✴️<br>${critTotal()}%</div>
+      <div class="statBox">💨<br>${dodgeTotal()}%</div>
+    </div>
+    <h2 style="margin-top:8px;font-size:13px">Felszerelés</h2>
+    <div style="font-size:11px;line-height:1.9">${player.weapon.icon} ${player.weapon.name}<br>${player.armor.icon} ${player.armor.name}<br>${player.ring.icon} ${player.ring.name}<br>${player.amulet.icon} ${player.amulet.name}</div>
+  `;
+  // Ha van osztály, töltjük a képet
+  if(player.class)loadPortrait();
+}
+
+function renderRight(){
+  let rp=document.getElementById("right-panel");
+  rp.innerHTML=`
+    <h2>Napló</h2>
+    <div class="log" id="log">${window.oldLog}</div>
+    <br>
+    <button onclick="clearLog()">🗑️ Törlés</button>
+  `;
+}
+
+function renderInv(){
+  document.getElementById("inv-count").textContent=`${player.inv.length}/${player.bagCap}`;
+  let html="";
+  for(let i=0;i<player.bagCap;i++){
+    html+=slotHtml(player.inv[i],i,"useInv");
+  }
+  document.getElementById("inv-row").innerHTML=html;
+}
+
+// ===================== SCREENS =====================
+function town(redraw=true){
+  saveLog();currentScreen="town";
+  if(redraw)render();
+  setMain(`
+    <h2>🏰 Város</h2>
+    <p style="margin-bottom:10px;line-height:1.6">A város főterén állsz. Kalandok várnak rád.</p>
+    <button onclick="work()">⚒️ Dolgozom</button>
+    <button onclick="daily()">☀️ Új nap</button>
+    <button onclick="forge()">🔨 Kovács</button>
+    <button onclick="alchemy()">⚗️ Alkimista</button>
+    <button onclick="arena()">🏟️ Aréna</button>
+    <button onclick="achievementPage()">🏆 Eredmények</button>
+  `);
+}
+
+function forge(){
+  let html="<h2>🔨 Kovács</h2>";
+  forgeRecipes.forEach((rec,i)=>{
+    html+=`<div class="equipBox"><b>${rec.reward.icon} ${rec.name}</b><br>Kell: ${rec.need.join(", ")}<br><span class="small">${rec.reward.desc}</span><br><button onclick="craftForge(${i})">Elkészítem</button></div>`;
+  });
+  setMain(html);
+}
+function craftForge(i){let rec=forgeRecipes[i];if(!hasItems(rec.need)){log("Nincs meg minden hozzávaló.");return}removeItems(rec.need);addItem(rec.reward);player.crafted++;log(`<span class="green">Elkészült: ${rec.reward.name}</span>`);render()}
+function alchemy(){
+  let html="<h2>⚗️ Alkimista</h2>";
+  alchemyRecipes.forEach((rec,i)=>{html+=`<div class="equipBox"><b>${rec.reward.icon} ${rec.name}</b><br>Kell: ${rec.need.join(", ")}<br><button onclick="craftAlchemy(${i})">Elkészítem</button></div>`});
+  setMain(html);
+}
+function craftAlchemy(i){let rec=alchemyRecipes[i];if(!hasItems(rec.need)){log("Nincs meg minden hozzávaló.");return}removeItems(rec.need);addItem(rec.reward);player.crafted++;log(`<span class="green">Elkészült: ${rec.reward.name}</span>`);render()}
+
+function arena(){
+  let html="<h2>🏟️ Aréna</h2>";
+  arenaEnemies.forEach((e,i)=>{html+=`<div class="equipBox"><b>${e.icon} ${e.name}</b><br>Szint: ${e.level}<br>Jutalom: ${e.xp} XP, ${e.silver} ezüst<br><button onclick="startArena(${i})">Kihívom</button></div>`});
+  setMain(html);
+}
+function startArena(i){enemy=JSON.parse(JSON.stringify(arenaEnemies[i]));currentScreen="battle";battleMessage="Az aréna ellenfeled rád támad!";render();log(`<span class="red">Aréna harc: ${enemy.name}</span>`)}
+
+function achievementDone(a){
+  let tk=Object.values(player.kills||{}).reduce((x,y)=>x+y,0);
+  if(a.id==="firstKill")return tk>=1;
+  if(a.id==="ratHunter")return(player.kills["Patkányember"]||0)>=3;
+  if(a.id==="deep10")return player.maxForestDepth>=10;
+  if(a.id==="firstBoss")return(player.bossKills||0)>=1;
+  if(a.id==="firstCraft")return(player.crafted||0)>=1;
+  if(a.id==="arena1")return(player.arenaWins||0)>=1;
+  return false;
+}
+function achievementPage(){
+  let html="<h2>🏆 Eredmények</h2>";
+  achievements.forEach(a=>{
+    let done=achievementDone(a),claimed=player.achievements.includes(a.id);
+    html+=`<div class="equipBox"><b>${done?"✅":"❌"} ${a.title}</b><br><span class="small">${a.desc}</span><br>+${a.reward.xp} XP, ${a.reward.silver} ezüst<br>
+    ${done&&!claimed?`<button onclick="claimAchievement('${a.id}')">Jutalom</button>`:claimed?`<span class="green">Átvéve</span>`:`<span class="small" style="color:#7a5a30">Nincs kész</span>`}
+    </div>`;
+  });
+  setMain(html);
+}
+function claimAchievement(id){
+  let a=achievements.find(x=>x.id===id);
+  if(!a||!achievementDone(a)){log("Még nincs kész.");return}
+  if(player.achievements.includes(id)){log("Már átvetted.");return}
+  player.achievements.push(id);player.xp+=a.reward.xp;player.silver+=a.reward.silver;
+  log(`<span class="gold">Achievement: ${a.title}</span>`);levelCheck();render();
+}
+
+// ===================== FOREST + MINIMAP =====================
+function forest(redraw=true){
+  saveLog();currentScreen="forest";
+  if(redraw)render();
+  let text=["Halvány fényt látsz balra.","Keskeny ösvény jobbra.","Sűrű bozót előtted.","Furcsa hangok a sötétből.","A fák elnyelik a fényt.","Valami megmozdult."][r(0,5)];
+  setMain(`
+    <h2>🌲 Sötét erdő</h2>
+    ${renderMinimap()}
+    <div class="forestBg">
+      <p style="margin-bottom:10px;font-style:italic;line-height:1.6">${text}</p>
+      <div class="forestChoice">
+        <button onclick="forestDir(-1,0)">⬅️ Balra</button>
+        <button onclick="forestDir(0,-1)">⬆️ Előre</button>
+        <button onclick="forestDir(1,0)">➡️ Jobbra</button>
+        <button onclick="forestDir(0,1)">⬇️ Hátra</button>
+        <button onclick="forestSearch()">🔍 Körülnézek</button>
+      </div>
+      <br>
+      <button onclick="leaveForest()">🏰 Vissza a városba</button>
+    </div>
+  `);
+}
+
+function forestDir(dx,dy){
+  if(!useClick(1))return;
+  movePlayer(dx,dy);
+  let cell=minimap[playerPos.y][playerPos.x];
+  forestDepth++;
+  if(forestDepth>player.maxForestDepth)player.maxForestDepth=forestDepth;
+
+  if(cell.type==="enemy"&&cell.event!=="done"){
+    cell.event="done";
+    startBattleFromForest();return;
+  }
+  if(cell.type==="loot"&&cell.event!=="done"){
+    cell.event="done";
+    let loot=forestLoot[r(0,forestLoot.length-1)];
+    addItem(loot);log(`<span class="green">Találtál: ${loot.name}</span>`);
+    cell.type="empty";
+  }
+  if(cell.type==="hideout"&&cell.event!=="done"){
+    cell.event="done";
+    findHideout();return;
+  }
+  if(Math.random()<0.12){
+    let block=["Sűrű bozót.","Kidőlt fa.","Mocsár.","Túl sötét."];
+    log(block[r(0,block.length-1)]);
+  }
+  render();
+}
+
+function forestSearch(){
+  if(!useClick(1))return;
+  let c=Math.random();
+  if(c<0.30){let loot=forestLoot[r(0,forestLoot.length-1)];addItem(loot);log(`<span class="green">Találtál: ${loot.name}</span>`)}
+  else if(c<0.50){startBattleFromForest();return}
+  else if(c<0.62){findHideout();return}
+  else log("Csak fákat és régi nyomokat látsz.");
+  render();
+}
+
+function findHideout(){currentScreen="hideout";render();log(`<span class="gold">Idegen rejtekhelyet találtál!</span>`)}
+function hideout(redraw=true){
+  saveLog();currentScreen="hideout";
+  if(redraw)render();
+  setMain(`
+    <h2>🕯️ Idegen rejtekhely</h2>
+    <p style="margin-bottom:10px;line-height:1.6">Egy elhagyott barlangra bukkantál. Bent lehet kincs, de őr is.</p>
+    <button onclick="enterHideout()">🚪 Bemegyek</button>
+    <button onclick="forest()">🌲 Vissza az erdőbe</button>
+  `);
+}
+function enterHideout(){
+  if(!useClick(2))return;
+  let c=Math.random();
+  if(c<0.35){
+    enemy={name:"Rejtekhely őre",icon:"🧟",imgPrompt:"undead hideout guardian",level:player.level+2,hp:90+player.level*20,maxHp:90+player.level*20,atk:12+player.level*3,xp:80+player.level*20,silver:120+player.level*40};
+    currentScreen="battle";battleMessage="A rejtekhely őre rád támad!";render();
+    log(`<span class="red">A rejtekhely őre rád ront!</span>`);return;
+  }
+  let pool=[...forestLoot];
+  if(Math.random()<0.10)pool.push({name:"Rozsdás kulcs",type:"key",icon:"🗝️",desc:"Dungeon kulcs"});
+  if(Math.random()<0.25)pool=[...pool,...rareLoot];
+  let item=pool[r(0,pool.length-1)];
+  let money=r(60,140);
+  addItem(item);player.silver+=money;
+  log(`<span class="green">Kincset találtál: ${item.name} és ${money} ezüst.</span>`);
+  currentScreen="forest";render();
+}
+
+// ===================== TAVERN =====================
+function tavern(redraw=true){
+  saveLog();currentScreen="tavern";
+  if(redraw)render();
+  let html=`<h2>🍺 Kocsma</h2><h2 style="font-size:13px;margin-top:4px">Aktív küldetések</h2>`;
+  if(activeQuests.length===0)html+=`<p style="color:#7a5a30;font-style:italic">Nincs aktív küldetésed.</p>`;
+  activeQuests.forEach(qid=>{
+    let q=quests.find(x=>x.id===qid),p=getQuestProgress(q);
+    html+=`<div class="equipBox"><b>${q.title}</b><br><span class="small">${q.desc}</span><br><span class="gold">${p}/${q.need}</span><br><button onclick="turnInQuest('${q.id}')">Leadás</button></div>`;
+  });
+  html+=`<h2 style="font-size:13px;margin-top:6px">Felvehető küldetések</h2>`;
+  quests.forEach(q=>{
+    if(activeQuests.includes(q.id)||completedQuestIds.includes(q.id))return;
+    html+=`<div class="equipBox"><b>${q.title}</b><br><span class="small">${q.desc}</span><br><span class="green">+${q.reward.xp} XP, ${q.reward.silver} ezüst</span><br><button onclick="takeQuest('${q.id}')">Felveszem</button></div>`;
+  });
+  setMain(html);
+}
+function takeQuest(id){if(activeQuests.length>=3){log("Max 3 küldetés.");return}activeQuests.push(id);log("Küldetés felvéve.");render()}
+function getQuestProgress(q){
+  if(q.type==="kill")return player.kills[q.target]||0;
+  if(q.type==="find")return player.found[q.target]||0;
+  if(q.type==="depth")return player.maxForestDepth||0;
+  return 0;
+}
+function turnInQuest(id){
+  let q=quests.find(x=>x.id===id),p=getQuestProgress(q);
+  if(p<q.need){log("Még nincs kész.");return}
+  player.xp+=q.reward.xp;player.silver+=q.reward.silver;addItem(q.reward.item);
+  activeQuests=activeQuests.filter(x=>x!==id);completedQuestIds.push(id);
+  log(`<span class="green">Küldetés leadva: ${q.title}</span>`);levelCheck();render();
+}
+
+// ===================== CLASS =====================
+function classRoom(redraw=true){
+  saveLog();currentScreen="class";
+  if(redraw)render();
+  let html=`<h2>🧬 Kaszt & Képességek</h2>
+  <p style="margin-bottom:6px">Nem: <button onclick="setGender('male')">♂️</button> <button onclick="setGender('female')">♀️</button></p>`;
+  if(player.level<5)html+=`<p style="color:#7a5a30;font-style:italic">5. szinttől választhatsz kasztot.</p>`;
+  else if(!player.class)html+=`<p style="margin-bottom:6px">Kaszt:
+    <button onclick="chooseClass('warrior')">🛡️ Harcos</button>
+    <button onclick="chooseClass('mage')">🔮 Mágus</button>
+    <button onclick="chooseClass('archer')">🏹 Íjász</button>
+    <button onclick="chooseClass('ninja')">🥷 Ninja</button></p>`;
+  else html+=`<p>Kasztod: <b class="gold">${classes[player.class].name}</b></p>`;
+  html+=`<h2 style="margin-top:8px;font-size:13px">Képességpontok: <span class="gold">${player.statPoints}</span></h2>`;
+  [["str","Erő"],["vit","Vitalitás"],["int","Intelligencia"],["dex","Ügyesség"],["luck","Szerencse"]].forEach(([k,n])=>{
+    html+=`<p style="margin:4px 0">${n}: ${player.stats[k]} <button onclick="addStat('${k}')">+</button></p>`;
+  });
+  setMain(html);
+}
+function setGender(g){player.gender=g;log("Nem: "+g);render()}
+function chooseClass(c){player.class=c;log("Kaszt: "+classes[c].name);render()}
+function addStat(s){
+  if(player.statPoints<=0){log("Nincs képességpont.");return}
+  player.stats[s]++;player.statPoints--;
+  player.maxHp=100+(player.level-1)*25+player.stats.vit*10;
+  player.maxEn=50+(player.level-1)*10+player.stats.int*5;
+  render();
+}
+
+// ===================== EQUIPMENT =====================
+function equipment(redraw=true){
+  saveLog();currentScreen="equipment";
+  if(redraw)render();
+  setMain(`
+    <h2>🛡️ Felszerelés</h2>
+    <div class="equipBox"><b>${player.weapon.icon} Fegyver:</b> ${player.weapon.name}<br><button onclick="unequip('weapon')">Leveszem</button></div>
+    <div class="equipBox"><b>${player.armor.icon} Vért:</b> ${player.armor.name}<br><button onclick="unequip('armor')">Leveszem</button></div>
+    <div class="equipBox"><b>${player.ring.icon} Gyűrű:</b> ${player.ring.name}<br><button onclick="unequip('ring')">Leveszem</button></div>
+    <div class="equipBox"><b>${player.amulet.icon} Amulett:</b> ${player.amulet.name}<br><button onclick="unequip('amulet')">Leveszem</button></div>
+    <p style="font-style:italic;color:#7a5a30;margin-top:6px;font-size:11px">Inventoryból kattintással vehetsz fel új cuccot.</p>
+  `);
+}
+function unequip(slot){
+  let empty={
+    weapon:{name:"Bot",type:"weapon",classReq:"all",atk:2,icon:"🪵",desc:"+2 atk"},
+    armor:{name:"Rongyos ruha",type:"armor",classReq:"all",def:1,icon:"🥼",desc:"+1 def"},
+    ring:{name:"Nincs gyűrű",type:"ring",classReq:"all",icon:"⭕",desc:"Üres"},
+    amulet:{name:"Nincs amulett",type:"amulet",classReq:"all",icon:"📿",desc:"Üres"}
+  };
+  let item=player[slot];
+  if(item.name.startsWith("Nincs")||item.name==="Bot"||item.name==="Rongyos ruha"){log("Nincs mit levenni.");return}
+  if(player.inv.length>=player.bagCap){log("Tele a táskád.");return}
+  player.inv.push(item);player[slot]=empty[slot];log("Levetted: "+item.name);render();
+}
+
+// ===================== HOME / STASH =====================
+function home(redraw=true){
+  saveLog();currentScreen="home";
+  if(redraw)render();
+  let inv=player.inv.map((it,i)=>`<div class="slot common" onclick="deposit(${i})"><div class="slot-emoji">${it.icon}</div><b>${it.name}</b><span class="small">⬇ Berak</span></div>`).join("");
+  let st=player.stash.map((it,i)=>`<div class="slot common" onclick="withdraw(${i})"><div class="slot-emoji">${it.icon}</div><b>${it.name}</b><span class="small">⬆ Kivesz</span></div>`).join("");
+  setMain(`
+    <h2>🏚️ Saját rejtekhely</h2>
+    <button onclick="homeRest()">🛏️ Pihenek</button>
+    <h2 style="margin-top:8px;font-size:13px">Táskád</h2>
+    <div class="inv" style="flex-wrap:wrap">${inv||"<span class='small'>Üres</span>"}</div>
+    <h2 style="margin-top:8px;font-size:13px">Raktár ${player.stash.length}/${player.stashCap}</h2>
+    <div class="inv" style="flex-wrap:wrap">${st||"<span class='small'>Üres</span>"}</div>
+  `);
+}
+function homeRest(){player.hp=player.maxHp;player.en=player.maxEn;log("Megpihentél.");render()}
+function deposit(i){if(player.stash.length>=player.stashCap){log("Tele a raktár.");return}player.stash.push(player.inv[i]);player.inv.splice(i,1);render()}
+function withdraw(i){if(player.inv.length>=player.bagCap){log("Tele a táskád.");return}player.inv.push(player.stash[i]);player.stash.splice(i,1);render()}
+
+// ===================== DUNGEON =====================
+function dungeon(redraw=true){
+  saveLog();currentScreen="dungeon";
+  if(redraw)render();
+  let keys=player.inv.filter(x=>x.name==="Rozsdás kulcs").length;
+  if(keys<=0){setMain(`<h2>🕳️ Dungeon</h2><p style="line-height:1.6">Kell <b>Rozsdás kulcs</b>. Rejtekhelyekből vagy alkimistától szerezhetsz.</p>`);return}
+  setMain(`<h2>🕳️ Elfeledett kripta</h2><p style="margin-bottom:10px">Kulcsaid: <b class="gold">${keys}</b>. Minden belépés 1 kulcsot fogyaszt.</p><button onclick="enterDungeon()">🚪 Belépek</button>`);
+}
+function enterDungeon(){
+  let i=player.inv.findIndex(x=>x.name==="Rozsdás kulcs");
+  if(i<0){log("Nincs kulcs.");return}
+  player.inv.splice(i,1);
+  enemy=JSON.parse(JSON.stringify(dungeonBosses[r(0,dungeonBosses.length-1)]));
+  currentScreen="battle";battleMessage="A dungeon ura rád támadt!";
+  render();log("<span class='red'>Beléptél a dungeonbe.</span>");
+}
+
+// ===================== SHOP =====================
+function shop(redraw=true){
+  saveLog();currentScreen="shop";
+  if(redraw)render();
+  let html=`<h2>🛒 Bolt</h2><p style="margin-bottom:8px">Ezüstöd: <b class="gold">${player.silver}🪙</b></p>`;
+  shopItems.forEach((it,i)=>{
+    html+=`<div class="equipBox"><b>${it.icon} ${it.name}</b><br><span class="small">${it.desc||""}</span><br><span class="gold">${it.price} ezüst</span> <button onclick="buy(${i})">Megveszem</button></div>`;
+  });
+  setMain(html);
+}
+
+// ===================== BATTLE =====================
+function skillButtons(){
+  if(!player.class)return"";
+  const s={
+    warrior:`<button onclick="useSkill('slash')">🗡️ Hasítás</button><button onclick="useSkill('shield')">🛡️ Pajzsütés</button><button onclick="useSkill('rage')">🔥 Dühroham</button><button onclick="useSkill('execute')">☠️ Kivégzés</button>`,
+    mage:`<button onclick="useSkill('fire')">🔥 Tűzgolyó</button><button onclick="useSkill('ice')">❄️ Jégszilánk</button><button onclick="useSkill('heal')">✨ Gyógyítás</button><button onclick="useSkill('storm')">⚡ Villám</button>`,
+    archer:`<button onclick="useSkill('shot')">🎯 Pontos lövés</button><button onclick="useSkill('multi')">🏹 Sortűz</button><button onclick="useSkill('trap')">🪤 Csapda</button><button onclick="useSkill('eagle')">🦅 Saslövés</button>`,
+    ninja:`<button onclick="useSkill('backstab')">🗡️ Hátbaszúrás</button><button onclick="useSkill('smoke')">💨 Füstbomba</button><button onclick="useSkill('shuriken')">⭐ Shuriken</button><button onclick="useSkill('shadow')">🌑 Árnycsapás</button>`
+  };
+  return s[player.class]||"";
+}
+
+function useSkill(s){
+  if(!enemy||!useClick(2))return;
+  if(player.en<12){log("Nincs elég energia.");return}
+  player.en-=12;
+  let dmg=0,skip=false;
+  if(s==="slash")dmg=atkTotal()+player.stats.str*4+r(8,18);
+  if(s==="shield"){dmg=atkTotal()+defTotal()+r(5,12);skip=true}
+  if(s==="rage")dmg=Math.floor((atkTotal()+player.stats.str*5+r(10,25))*1.4);
+  if(s==="execute")dmg=enemy.hp<enemy.maxHp*0.35?enemy.hp+5:atkTotal()+r(8,15);
+  if(s==="fire")dmg=atkTotal()+player.stats.int*6+bonus("int")*6+r(12,24);
+  if(s==="ice"){dmg=atkTotal()+player.stats.int*4+bonus("int")*4+r(8,18);skip=true}
+  if(s==="heal"){let h=40+player.stats.int*5+bonus("int")*5;player.hp=Math.min(player.maxHp,player.hp+h);battleMessage=`Gyógyítottál <span class="green">${h}</span> életet.`;log(`Gyógyítottál ${h} életet.`);showDamage("+"+h,"heal");renderLeft();renderInv();renderBattle();return}
+  if(s==="storm")dmg=Math.floor((atkTotal()+player.stats.int*7+bonus("int")*7+r(15,30))*1.5);
+  if(s==="shot")dmg=atkTotal()+player.stats.dex*5+bonus("dex")*5+r(10,20);
+  if(s==="multi")dmg=atkTotal()+player.stats.dex*3+bonus("dex")*3+r(15,35);
+  if(s==="trap"){dmg=atkTotal()+player.stats.dex*3+r(8,16);skip=true}
+  if(s==="eagle")dmg=Math.floor((atkTotal()+player.stats.dex*7+bonus("dex")*7+r(12,28))*1.4);
+  if(s==="backstab")dmg=Math.floor((atkTotal()+player.stats.dex*5+bonus("dex")*5+r(12,22))*1.5);
+  if(s==="smoke"){dmg=atkTotal()+r(5,12);skip=true}
+  if(s==="shuriken")dmg=atkTotal()+player.stats.dex*4+bonus("dex")*4+r(10,24);
+  if(s==="shadow")dmg=Math.floor((atkTotal()+player.stats.dex*7+bonus("dex")*7+player.stats.luck*2+bonus("luck")*2+r(15,30))*1.45);
+  enemy.hp-=dmg;
+  battleMessage=`Képesség: <span class="green">${dmg}</span> sebzés.`;
+  log(`Képesség <span class="green">${dmg}</span>`);
+  showDamage(dmg,"dmg");enemyShake();
+  if(enemy.hp<=0){win();return}
+  if(!skip)enemyTurn();else log("Az ellenfél elvesztette körét.");
+  renderLeft();renderBattle();renderInv();
+}
+
+function battle(redraw=true){
+  if(redraw)render();
+  renderBattle();
+  loadEnemyImage(enemy);
+}
+
+function renderBattle(){
+  let key=enemy?"enemy_"+enemy.name:"";
+  let enemyImgHtml=enemy?`<div id="enemyArtWrap" class="enemyArtWrap">${imgCache[key]?`<img src="${imgCache[key]}" style="width:100%;height:100%;object-fit:cover;border-radius:6px" alt="">`:`<span class="enemy-emoji">${enemy?enemy.icon:"?"}</span>`}</div>`:"";
+  setMain(`
+    <h2 style="text-align:center">⚔️ Harc ⚔️</h2>
+    <div class="battleBox">
+      <div class="enemyName">${enemy?enemy.name:""}</div>
+      <div style="text-align:center;font-size:11px;color:#ff4b4b;margin:2px 0">Szint: ${enemy?enemy.level:""}</div>
+      ${enemyImgHtml}
+      ${enemy?bar("❤️",enemy.hp,enemy.maxHp,"hp"):""}
+      <br>
+      <button onclick="attack()">⚔️ Támadás</button>
+      <button onclick="power()">✴️ Erős ütés</button>
+      <button onclick="potion()">🧪 Gyógyital</button>
+      <button onclick="run()">🏃 Menekülés</button>
+      <br>${skillButtons()}
+      <div class="battleText">${battleMessage}</div>
+    </div>
+  `);
+}
+
+function attack(){
+  if(!enemy||!useClick(1))return;
+  if(Math.random()<0.08){battleMessage=`<span class="blue">Elhibáztad!</span>`;enemyTurn();renderLeft();renderBattle();renderInv();return}
+  let dmg=atkTotal()+r(1,8);
+  let isCrit=Math.random()<critTotal()/100;
+  if(isCrit)dmg=Math.floor(dmg*1.8);
+  enemy.hp-=dmg;
+  battleMessage=`Megütötted <span class="green">${dmg}</span>. ${isCrit?'<span style="color:#ffd633">💥 KRIT!</span>':""}`;
+  log(`Megütötted: <span class="green">${dmg}</span>${isCrit?' 💥':''}`);
+  showDamage(dmg,isCrit?"crit":"dmg");enemyShake();
+  if(enemy.hp<=0){win();return}
+  enemyTurn();renderLeft();renderBattle();renderInv();
+}
+
+function power(){
+  if(!enemy)return;
+  if(player.en<12){log("Nincs elég energia.");return}
+  if(!useClick(2))return;
+  player.en-=12;
+  let dmg=Math.floor((atkTotal()+r(8,18))*1.5);
+  enemy.hp-=dmg;
+  battleMessage=`Erős ütés: <span class="green">${dmg}</span>`;
+  log(`Erős ütés: <span class="green">${dmg}</span>`);
+  showDamage(dmg,"crit");enemyShake();
+  if(enemy.hp<=0){win();return}
+  enemyTurn();renderLeft();renderBattle();renderInv();
+}
+
+function enemyTurn(){
+  if(!enemy)return;
+  if(Math.random()<dodgeTotal()/100){battleMessage+=`<br><span class="blue">Kitértél!</span>`;log("Kitértél.");return}
+  let dmg=Math.max(1,enemy.atk+r(1,6)-defTotal());
+  player.hp-=dmg;
+  battleMessage+=`<br><span class="red">${enemy.name}</span> visszaütött ${dmg}`;
+  log(`<span class="red">${enemy.name}</span> visszaütött ${dmg}`);
+  if(player.hp<=0){
+    player.hp=Math.floor(player.maxHp/2);player.silver=Math.floor(player.silver*.8);
+    enemy=null;currentScreen="town";log("⚰️ Elájultál!");
+  }
+}
+
+function showDamage(text,type=""){
+  let box=document.querySelector(".battleBox");
+  if(!box)return;
+  let d=document.createElement("div");
+  d.className="damagePop "+type;d.innerText=text;
+  box.appendChild(d);setTimeout(()=>d.remove(),820);
+}
+function enemyShake(){
+  let e=document.getElementById("enemyArtWrap");
+  if(!e)return;
+  e.classList.remove("enemyHit");void e.offsetWidth;e.classList.add("enemyHit");
+  setTimeout(()=>e.classList.remove("enemyHit"),280);
+}
+
+function win(){
+  log(`Legyőzted: <span class="red">${enemy.name}</span>`);
+  player.kills[enemy.name]=(player.kills[enemy.name]||0)+1;
+  if(enemy.boss)player.bossKills++;
+  if(enemy.arena)player.arenaWins++;
+  player.silver+=enemy.silver;player.xp+=enemy.xp;
+  log(`Jutalom: ${enemy.silver} ezüst, ${enemy.xp} XP.`);
+  if(enemy.boss){let item=rareLoot[r(0,rareLoot.length-1)];addItem(item);log(`<span class="gold">Zsákmány: ${item.name}</span>`)}
+  else if(Math.random()<0.55){
+    let pool=[...forestLoot];
+    if(Math.random()<0.15)pool=[...pool,...rareLoot];
+    addItem(pool[r(0,pool.length-1)]);
+  }
+  enemy=null;levelCheck();currentScreen="town";render();
+}
+
+function levelCheck(){
+  while(player.xp>=needXp()){
+    player.xp-=needXp();player.level++;player.statPoints+=5;
+    player.maxHp+=25;player.maxEn+=10;player.atk+=3;player.def+=1;
+    player.hp=player.maxHp;player.en=player.maxEn;
+    log(`🔥 <span class="gold">Szintet léptél! Szint: ${player.level}. +5 pont.</span>`);
+  }
+}
+
+// ===================== INVENTORY =====================
+function potion(){
+  let i=player.inv.findIndex(x=>x.type==="potion");
+  if(i<0){log("Nincs gyógyitalod.");return}
+  let h=35;if(player.inv[i].name==="Nagy gyógyital")h=75;if(player.inv[i].name==="Erdei gomba")h=15;
+  player.inv.splice(i,1);player.hp=Math.min(player.maxHp,player.hp+h);
+  log(`Gyógyultál +${h}.`);showDamage("+"+h,"heal");renderLeft();renderBattle();renderInv();
+}
+
+function useInv(i){
+  let it=player.inv[i];if(!it)return;
+  if(it.type==="potion"){
+    let h=35;if(it.name==="Nagy gyógyital")h=75;if(it.name==="Erdei gomba")h=15;
+    player.inv.splice(i,1);player.hp=Math.min(player.maxHp,player.hp+h);
+    log(`Használtad: ${it.name}. +${h} élet.`);
+  }else if(["weapon","armor","ring","amulet"].includes(it.type)){
+    if(it.classReq!=="all"&&player.class!==it.classReq){
+      let price=r(80,180);player.silver+=price;player.inv.splice(i,1);
+      log(`Nem a kasztodnak való, eladtad: ${it.name} +${price} ezüst.`);render();return;
+    }
+    let old=player[it.type];player[it.type]=it;player.inv.splice(i,1);
+    if(old&&old.name&&!old.name.startsWith("Nincs")&&old.name!=="Bot"&&old.name!=="Rongyos ruha")player.inv.push(old);
+    log(`Felszerelted: ${it.name}`);
+  }else if(it.type==="key"){log("Ez kulcs. Dungeonben használható.");}
+  else{
+    let price=r(15,60);if(it.desc==="Ritka")price=r(60,140);
+    player.silver+=price;player.inv.splice(i,1);
+    log(`Eladtad: ${it.name} +${price} ezüst.`);
+  }
+  render();
+}
+
+function buy(i){
+  let it=shopItems[i];if(player.silver<it.price){log("Nincs elég ezüst.");return}
+  if(it.type==="bag"){if(it.bagCap<=player.bagCap){log("Már nagyobb táskád van.");return}player.silver-=it.price;player.bagCap=it.bagCap;log("Nagyobb táska!");render();return}
+  player.silver-=it.price;
+  addItem(it.type==="weapon"||it.type==="armor"?{...it}:{name:it.name,type:it.type,icon:it.icon,desc:it.desc});
+  log(`Megvetted: ${it.name}`);render();
+}
+
+// ===================== MISC =====================
+function run(){enemy=null;currentScreen="forest";log("Elmenekültél.");render()}
+function work(){if(!useClick(5))return;let m=r(40,90);player.silver+=m;player.en=Math.max(0,player.en-8);log("Dolgoztál. +"+m+" ezüst.");renderLeft();renderInv()}
+function daily(){player.clicks=80+player.level*10;player.en=player.maxEn;log("☀️ Új nap!");renderLeft()}
+function rest(){if(player.silver<20){log("Nincs elég ezüst.");return}player.silver-=20;player.hp=player.maxHp;player.en=player.maxEn;log("Megpihentél. (20 ezüst)");renderLeft()}
+function leaveForest(){forestDepth=0;initMinimap();town()}
+function clearLog(){window.oldLog="";let b=document.getElementById("log");if(b)b.innerHTML=""}
+
+function hasItems(list){let temp=[...player.inv];for(let n of list){let i=temp.findIndex(x=>x.name===n);if(i<0)return false;temp.splice(i,1)}return true}
+function removeItems(list){for(let n of list){let i=player.inv.findIndex(x=>x.name===n);if(i>=0)player.inv.splice(i,1)}}
+
+function startBattleFromForest(){
+  enemy=JSON.parse(JSON.stringify(enemies[r(0,enemies.length-1)]));
+  currentScreen="battle";battleMessage="Az erdőből rád rontott valami!";
+  render();log(`<span class="red">Rád támadt: ${enemy.name}</span>`);
+}
+
+// ===================== MENTÉS =====================
+function save(){
+  saveLog();
+  localStorage.setItem("arkanorSave",JSON.stringify(player));
+  localStorage.setItem("arkanorLog",window.oldLog);
+  localStorage.setItem("arkanorDepth",forestDepth);
+  localStorage.setItem("arkanorQuests",JSON.stringify(activeQuests));
+  localStorage.setItem("arkanorDoneQuests",JSON.stringify(completedQuestIds));
+  log("💾 Játék elmentve.");
+}
+function load(){
+  let s=localStorage.getItem("arkanorSave");if(!s){log("Nincs mentés.");return}
+  player=JSON.parse(s);normalize();
+  window.oldLog=localStorage.getItem("arkanorLog")||"";
+  forestDepth=parseInt(localStorage.getItem("arkanorDepth")||"0");
+  activeQuests=JSON.parse(localStorage.getItem("arkanorQuests")||"[]");
+  completedQuestIds=JSON.parse(localStorage.getItem("arkanorDoneQuests")||"[]");
+  currentScreen="town";render();log("📜 Mentés betöltve.");
+}
+
+// ===================== START =====================
+normalize();
+render();
+log("Beléptél <span class='gold'>Arkanor</span> világába. Jó kalandozást!");
+</script>
+</body>
+</html>
