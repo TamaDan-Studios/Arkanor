@@ -891,19 +891,22 @@ function updatePortrait(src){
 }
 
 // ===================== ENEMY IMAGE =====================
-async function loadEnemyImage(e){
+function loadEnemyImage(e){
   if(!e)return;
-  let key="enemy_"+e.name;
-  // Pixel sprite fallback azonnal
-  let sprite=makePixelSprite(e.icon,160);
-  if(!imgCache[key])imgCache[key]=sprite;
-  updateEnemyImage(imgCache[key]);
+
+  if(e.img){
+    updateEnemyImage(e.img);
+    return;
+  }
+
+  let sprite=makePixelSprite(e.icon || "?",160);
+  updateEnemyImage(sprite);
 }
 
 function updateEnemyImage(src){
   let wrap=document.getElementById("enemyArtWrap");
   if(!wrap)return;
-  wrap.innerHTML=`<img src="${src}" alt="ellenfél" style="width:100%;height:100%;object-fit:cover;border-radius:6px">`;
+  wrap.innerHTML=`<img src="${src}" alt="ellenfél" style="width:100%;height:100%;object-fit:contain;border-radius:6px">`;
 }
 
 // ===================== RENDER =====================
