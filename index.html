@@ -1019,12 +1019,6 @@ function updateEnemyImage(src){
   wrap.innerHTML=`<img src="${src}" alt="ellenfél">`;
 }
 
-function updateEnemyImage(src){
-  let wrap=document.getElementById("enemyArtWrap");
-  if(!wrap)return;
-  wrap.innerHTML=`<img src="${src}" alt="ellenfél" style="width:100%;height:100%;object-fit:contain;border-radius:6px">`;
-}
-
 // ===================== RENDER =====================
 function render(){
   normalize();
