@@ -1007,6 +1007,16 @@ function updateEnemyImage(src){
   wrap.innerHTML=`<img src="${src}" alt="ellenfél">`;
 }
 
+  let sprite=makePixelSprite(e.icon || "?",160);
+  updateEnemyImage(sprite);
+}
+
+function updateEnemyImage(src){
+  let wrap=document.getElementById("enemySprite");
+  if(!wrap)return;
+  wrap.innerHTML=`<img src="${src}" alt="ellenfél">`;
+}
+
 // ===================== RENDER =====================
 function render(){
   normalize();
