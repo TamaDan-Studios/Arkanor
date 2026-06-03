@@ -207,34 +207,132 @@ button:active{transform:scale(.97);filter:brightness(.95)}
 .battleBox{
   position:relative;
   background:
-    linear-gradient(rgba(0,0,0,.45),rgba(0,0,0,.55)),
-    url("https://images.unsplash.com/photo-1518709268805-4e9042af9f23?q=80&w=1200&auto=format&fit=crop");
-  background-size:cover;background-position:center;
-  border-radius:6px;padding:12px;border:1px solid #8a571c;overflow:hidden;
+    linear-gradient(rgba(0,0,0,.35),rgba(0,0,0,.72)),
+    url("https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1200");
+  background-size:cover;
+  background-position:center;
+  border-radius:8px;
+  padding:10px;
+  border:2px solid #8a571c;
+  overflow:hidden;
 }
-.enemyName{text-align:center;color:#ffd86b;font-family:'Cinzel',serif;font-size:20px;font-weight:700;text-shadow:0 0 12px rgba(255,180,60,.5)}
-.enemyArtWrap{
-  height:160px;border:1px solid rgba(138,87,28,.6);
-  background:radial-gradient(circle at center,rgba(255,120,0,.2),transparent 55%),linear-gradient(rgba(25,16,10,.7),rgba(5,3,2,.8));
-  display:flex;align-items:center;justify-content:center;
-  margin:8px 0;border-radius:6px;position:relative;overflow:hidden;
-  animation:floatEnemy 3s ease-in-out infinite;
+
+.enemyName{
+  text-align:center;
+  color:#ffd86b;
+  font-family:'Cinzel',serif;
+  font-size:22px;
+  font-weight:700;
+  text-shadow:0 0 12px #000;
 }
-.enemyArtWrap img{width:100%;height:100%;object-fit:cover}
-.enemyArtWrap.enemyHit{animation:enemyHitAnim .25s ease both}
-.enemy-emoji{font-size:80px}
-.battleText{
-  border:1px solid #6b4215;background:rgba(8,5,2,.78);
-  padding:8px 10px;min-height:50px;margin-top:8px;font-size:13px;line-height:1.5;border-radius:4px;
+
+.fightScene{
+  position:relative;
+  height:330px;
+  border:1px solid #9b671f;
+  border-radius:8px;
+  overflow:hidden;
+  background:
+    linear-gradient(rgba(0,0,0,.15),rgba(0,0,0,.55)),
+    url("https://images.unsplash.com/photo-1448375240586-882707db888b?q=80&w=1200");
+  background-size:cover;
+  background-position:center;
+  margin:8px 0;
 }
+
+.heroFighter,.enemyFighter{
+  position:absolute;
+  bottom:35px;
+  width:42%;
+  height:230px;
+  display:flex;
+  align-items:flex-end;
+  justify-content:center;
+}
+
+.heroFighter{left:2%}
+.enemyFighter{right:2%}
+
+.heroFighter .heroSprite{
+  font-size:115px;
+  filter:drop-shadow(0 10px 12px #000);
+  transform:scaleX(-1);
+}
+
+.enemyFighter img{
+  max-width:100%;
+  max-height:100%;
+  object-fit:contain;
+  filter:drop-shadow(0 10px 12px #000);
+}
+
+.combatCard{
+  position:absolute;
+  bottom:8px;
+  width:42%;
+  background:rgba(0,0,0,.72);
+  border:1px solid #9b671f;
+  border-radius:6px;
+  padding:6px;
+}
+
+.heroCard{left:2%}
+.enemyCard{right:2%}
+
+.combatCard b{
+  color:#ffd86b;
+  font-family:'Cinzel',serif;
+  font-size:13px;
+}
+
 .damagePop{
-  position:absolute;left:50%;top:130px;transform:translateX(-50%);
-  font-family:'Cinzel',serif;font-size:38px;font-weight:700;color:#ff3333;
-  text-shadow:0 0 12px #000,0 0 20px rgba(255,50,50,.6);
-  animation:dmgFloat .8s forwards;pointer-events:none;z-index:20;
+  position:absolute;
+  font-family:'Cinzel',serif;
+  font-size:42px;
+  font-weight:700;
+  color:#ff3333;
+  text-shadow:0 0 12px #000,0 0 20px rgba(255,50,50,.8);
+  animation:dmgFloat .8s forwards;
+  pointer-events:none;
+  z-index:50;
 }
-.damagePop.crit{color:#ffd633;font-size:48px}
-.damagePop.heal{color:#44ff77}
+
+.damagePop.enemyDmg{
+  right:22%;
+  top:110px;
+}
+
+.damagePop.heroDmg{
+  left:22%;
+  top:110px;
+}
+
+.damagePop.crit{
+  color:#ffd633;
+  font-size:52px;
+}
+
+.damagePop.heal{
+  color:#44ff77;
+}
+
+.battleActions{
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:6px;
+  margin-top:8px;
+}
+
+.battleText{
+  border:1px solid #6b4215;
+  background:rgba(8,5,2,.85);
+  padding:8px 10px;
+  min-height:55px;
+  margin-top:8px;
+  font-size:13px;
+  line-height:1.5;
+  border-radius:4px;
+}
 
 /* ===== LOG ===== */
 .log{
@@ -903,6 +1001,24 @@ function loadEnemyImage(e){
   updateEnemyImage(sprite);
 }
 
+function loadEnemyImage(e){
+  if(!e)return;
+
+  if(e.img){
+    updateEnemyImage(e.img);
+    return;
+  }
+
+  let sprite=makePixelSprite(e.icon || "?",160);
+  updateEnemyImage(sprite);
+}
+
+function updateEnemyImage(src){
+  let wrap=document.getElementById("enemySprite");
+  if(!wrap)return;
+  wrap.innerHTML=`<img src="${src}" alt="ellenfél">`;
+}
+
 function updateEnemyImage(src){
   let wrap=document.getElementById("enemyArtWrap");
   if(!wrap)return;
@@ -1417,24 +1533,51 @@ function battle(redraw=true){
 }
 
 function renderBattle(){
-  let key=enemy?"enemy_"+enemy.name:"";
-  let enemyImgHtml=enemy?`<div id="enemyArtWrap" class="enemyArtWrap">${imgCache[key]?`<img src="${imgCache[key]}" style="width:100%;height:100%;object-fit:cover;border-radius:6px" alt="">`:`<span class="enemy-emoji">${enemy?enemy.icon:"?"}</span>`}</div>`:"";
+  if(!enemy)return;
+
+  let heroIcon = portraitEmoji();
+
   setMain(`
     <h2 style="text-align:center">⚔️ Harc ⚔️</h2>
     <div class="battleBox">
-      <div class="enemyName">${enemy?enemy.name:""}</div>
-      <div style="text-align:center;font-size:11px;color:#ff4b4b;margin:2px 0">Szint: ${enemy?enemy.level:""}</div>
-      ${enemyImgHtml}
-      ${enemy?bar("❤️",enemy.hp,enemy.maxHp,"hp"):""}
-      <br>
-      <button onclick="attack()">⚔️ Támadás</button>
-      <button onclick="power()">✴️ Erős ütés</button>
-      <button onclick="potion()">🧪 Gyógyital</button>
-      <button onclick="run()">🏃 Menekülés</button>
+      <div class="enemyName">${enemy.name}</div>
+      <div style="text-align:center;font-size:12px;color:#ff4b4b;margin:2px 0">Szint: ${enemy.level}</div>
+
+      <div class="fightScene">
+        <div class="heroFighter">
+          <div class="heroSprite">${heroIcon}</div>
+        </div>
+
+        <div class="enemyFighter" id="enemySprite">
+          <span class="enemy-emoji">${enemy.icon || "?"}</span>
+        </div>
+
+        <div class="combatCard heroCard">
+          <b>Vándor</b>
+          ${bar("❤️",player.hp,player.maxHp,"hp")}
+          ${bar("⚡",player.en,player.maxEn,"en")}
+        </div>
+
+        <div class="combatCard enemyCard">
+          <b>${enemy.name}</b>
+          ${bar("❤️",enemy.hp,enemy.maxHp,"hp")}
+        </div>
+      </div>
+
+      <div class="battleActions">
+        <button onclick="attack()">⚔️ Támadás</button>
+        <button onclick="power()">✴️ Erős ütés</button>
+        <button onclick="potion()">🧪 Gyógyital</button>
+        <button onclick="run()">🏃 Menekülés</button>
+      </div>
+
       <br>${skillButtons()}
+
       <div class="battleText">${battleMessage}</div>
     </div>
   `);
+
+  loadEnemyImage(enemy);
 }
 
 function attack(){
@@ -1470,6 +1613,7 @@ function enemyTurn(){
   if(Math.random()<dodgeTotal()/100){battleMessage+=`<br><span class="blue">Kitértél!</span>`;log("Kitértél.");return}
   let dmg=Math.max(1,enemy.atk+r(1,6)-defTotal());
   player.hp-=dmg;
+  showDamage("-"+dmg,"heroDmg");
   battleMessage+=`<br><span class="red">${enemy.name}</span> visszaütött ${dmg}`;
   log(`<span class="red">${enemy.name}</span> visszaütött ${dmg}`);
   if(player.hp<=0){
@@ -1478,12 +1622,16 @@ function enemyTurn(){
   }
 }
 
-function showDamage(text,type=""){
-  let box=document.querySelector(".battleBox");
+function showDamage(text,type="enemyDmg"){
+  let box=document.querySelector(".fightScene");
   if(!box)return;
+
   let d=document.createElement("div");
-  d.className="damagePop "+type;d.innerText=text;
-  box.appendChild(d);setTimeout(()=>d.remove(),820);
+  d.className="damagePop "+type;
+  d.innerText=text;
+
+  box.appendChild(d);
+  setTimeout(()=>d.remove(),820);
 }
 function enemyShake(){
   let e=document.getElementById("enemyArtWrap");
@@ -1505,8 +1653,10 @@ function win(){
     if(Math.random()<0.15)pool=[...pool,...rareLoot];
     addItem(pool[r(0,pool.length-1)]);
   }
-  enemy=null;levelCheck();currentScreen="town";render();
-}
+  enemy=null;
+levelCheck();
+currentScreen="forest";
+render();
 
 function levelCheck(){
   while(player.xp>=needXp()){
